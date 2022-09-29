@@ -125,6 +125,7 @@ rm -rf ./${PETSC_ARCH}
     --with-superlu=1      --download-superlu=yes \
     --with-superlu_dist=1 --download-superlu_dist="${top_dir}/downloads/b430c074a19bdfd897d5e2a285a85bc819db12e5.tar.gz" \
     --with-triangle=1     --download-triangle=yes \
+    --with-tetgen=1       --download-tetgen=yes \
     --with-viennacl=1     --download-viennacl=yes \
         || exit 1
 
