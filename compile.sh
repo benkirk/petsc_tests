@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-#PBS -q main
+#PBS -q casper
 #PBS -A SCSG0001
 #PBS -j oe
 #PBS -l walltime=01:00:00
-#PBS -l select=1:ncpus=60:mpiprocs=1:ompthreads=60:ngpus=2
+#PBS -l select=1:ncpus=32:mpiprocs=1:ompthreads=32:ngpus=2:gpu_model=v100
 
 # Handle arguments
 user_args=( "$@" )
 
-ncar_stack=no
+ncar_stack=yes
 from_git=no
 from_tarball=yes
 
@@ -42,13 +42,11 @@ EOF
 if [[ ${ncar_stack} == "yes" ]]; then
     cat >>config_env.sh <<EOF
 module reset
-module load gcc/11.2.0 cuda cray-libsci
+module load gnu cuda
 module list
-for tool in CC cc ftn gcc mpiexec; do
-    which \${tool}
-done
 export BUILD_CLASS="ncarenv"
-BLAS_LAPACK="-L${CRAY_LIBSCI_DIR}/cray/9.0/x86_64/lib -lsci_cray"
+MKL_LIB="/glade/u/apps/opt/intel/2022.1/mkl/latest/lib/intel64"
+BLAS_LAPACK="-L\${MKL_LIB} -Wl,-rpath,\${MKL_LIB} -lmkl_intel_lp64 -lmkl_sequential -lmkl_core"
 EOF
 
 # build using crayenv
@@ -105,11 +103,11 @@ cd ${PETSC_DIR} && pwd || exit 1
 mkdir -p ${top_dir}/downloads
 rm -rf ./${PETSC_ARCH}
 ./configure \
-    --with-cc=$(which cc) --COPTFLAGS="-O3" \
-    --with-cxx=$(which CC) --CXXOPTFLAGS="-O3" \
-    --with-fc=$(which ftn) --FOPTFLAGS="-O3" \
-    --with-cmake-dir=/glade/u/apps/common/22.08/spack/opt/spack/cmake/3.23.2/gcc/7.5.0 \
-    --with-cmake-exec=/glade/u/apps/common/22.08/spack/opt/spack/cmake/3.23.2/gcc/7.5.0/bin/cmake \
+    --with-cc=$(which mpicc) --COPTFLAGS="-O3" \
+    --with-cxx=$(which mpicxx) --CXXOPTFLAGS="-O3" \
+    --with-fc=$(which mpif90) --FOPTFLAGS="-O3" \
+    --with-cmake-dir=/glade/u/apps/dav/opt/cmake/3.22.0 \
+    --with-cmake-exec=/glade/u/apps/dav/opt/cmake/3.22.0/bin/cmake \
     --enable-cuda --CUDAOPTFLAGS="-O3" \
     --with-packages-download-dir="${top_dir}/downloads" \
     --with-shared-libraries --with-debugging=0 \

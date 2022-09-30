@@ -20,14 +20,16 @@
 #               OMPI_COMM_WORLD_LOCAL_RANK. For other MPI libraries, please
 #               set the LOCAL_RANK variable below to the appropriate one.
 
-export LOCAL_RANK=${PMI_LOCAL_RANK}
-export GLOBAL_RANK=${PMI_RANK}
+#export LOCAL_RANK=${PMI_LOCAL_RANK}
+#export GLOBAL_RANK=${PMI_RANK}
+export LOCAL_RANK=$OMPI_COMM_WORLD_LOCAL_RANK
+export GLOBAL_RANK=$OMPI_COMM_WORLD_RANK
 export my_CUDA_DEVICE=$(expr ${LOCAL_RANK} % 4)
 export CUDA_VISIBLE_DEVICES=${my_CUDA_DEVICE}
 
 printf "Global Rank %3d / Local Rank %3d / CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES} / $(hostname)\n" ${GLOBAL_RANK} ${LOCAL_RANK}
 
-debug_env=yes
+debug_env=no
 
 if [[ ${debug_env} == "yes" ]]; then
     envfile="env-${GLOBAL_RANK}-${PBS_JOBID}.out"
