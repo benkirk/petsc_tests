@@ -45,7 +45,7 @@ mpiexec -n 8 ${top_dir}/get_local_rank \
     || status="FAIL"
 
 echo && echo && echo "********* Inter-Node (x4) (GPU) *****************"
-mpiexec -n 32 ${top_dir}/get_local_rank \
+mpiexec -n 16 ${top_dir}/get_local_rank \
         ./ex19 -cuda_view -snes_monitor -pc_type mg -dm_mat_type aijcusparse -dm_vec_type cuda -da_refine 10 -snes_view -pc_mg_levels 9 -mg_levels_ksp_type chebyshev -mg_levels_pc_type jacobi -log_view \
     || status="FAIL"
 
